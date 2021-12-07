@@ -1,7 +1,6 @@
 package gow
 
 import (
-	"net/http"
 	"strings"
 )
 
@@ -44,11 +43,30 @@ func (r *router) addRoute(method string, pattern string, handler HandlerFunc) {
 	r.handlers[key] = handler
 }
 
-func (r *router) handle(c *Context) {
-	key := c.Method + "-" + c.Path
-	if handler, ok := r.handlers[key]; ok {
-		handler(c)
-	} else {
-		c.String(http.StatusNotFound, "404 NOT FOUND: %s\n", c.Path)
+func (r *router) getRoute(method string, path string) (*node, map[string]string) {
+	searchParts := parsePattern(path)
+	params := make(map[string]string)
+	root, ok := r.roots[method]
+
+	if !ok {
+		return nil, nil
 	}
+
+	n := root.search(searchParts, 0)
+
+	if n != nil {
+		parts := parsePattern(n.pattern)
+		for index, part := range parts {
+			if part[0] == ':' {
+				params[part[1:]] = searchParts[index]
+			}
+			if part[0] == '*' && len(part) > 1 {
+				params[part[1:]] = strings.Join(searchParts[index:], "/")
+				break
+			}
+		}
+		return n, params
+	}
+
+	return nil, nil
 }
