@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// H 给map[string]interface{}起了一个别名 H
 type H map[string]interface{}
 
 type Context struct {

@@ -17,6 +17,7 @@ func newRouter() *router {
 	}
 }
 
+// 格式化传入的url，并且分割映射
 func parsePattern(pattern string) []string {
 	vs := strings.Split(pattern, "/")
 
@@ -36,7 +37,8 @@ func (r *router) addRoute(method string, pattern string, handler HandlerFunc) {
 	parts := parsePattern(pattern)
 
 	key := method + "-" + pattern
-	_, ok := r.roots[key]
+	_, ok := r.roots[method]
+	// 如果不存在此方法(GET/POST...)则新建一个节点
 	if !ok {
 		r.roots[method] = &node{}
 	}
@@ -70,6 +72,16 @@ func (r *router) getRoute(method string, path string) (*node, map[string]string)
 	}
 
 	return nil, nil
+}
+
+func (r *router) getRoutes(method string) []*node {
+	root, ok := r.roots[method]
+	if !ok {
+		return nil
+	}
+	nodes := make([]*node, 0)
+	root.travel(&nodes)
+	return nodes
 }
 
 func (r *router) handle(c *Context) {

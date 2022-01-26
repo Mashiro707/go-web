@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-// HandlerFunc defines the request handler used by gow
+// HandlerFunc 框架的的请求处理方法
 type HandlerFunc func(*Context)
 
 // Engine implement the interface of ServeHTTP
@@ -40,7 +40,9 @@ func (group *RouterGroup) Group(prefix string) *RouterGroup {
 	return newGroup
 }
 
+// 添加路由
 func (group *RouterGroup) addRoute(method string, comp string, handler HandlerFunc) {
+	// 分组前缀+实际传入地址
 	pattern := group.prefix + comp
 	log.Printf("Route %4s - %s", method, pattern)
 	group.engine.router.addRoute(method, pattern, handler)
@@ -64,6 +66,7 @@ func (group *RouterGroup) Use(middlewares ...HandlerFunc) {
 	group.middlewares = append(group.middlewares, middlewares...)
 }
 
+// 实现了 net/http 包的 Handler 接口
 func (engine *Engine) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	var middlewares []HandlerFunc
 	for _, group := range engine.groups {

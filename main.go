@@ -7,17 +7,12 @@ import (
 
 func main() {
 	r := gow.New()
-	r.GET("/", func(c *gow.Context) {
-		c.HTML(http.StatusOK, "<h1>Hello Gee</h1>")
-	})
 
 	r.GET("/hello", func(c *gow.Context) {
-		// expect /hello?name=geektutu
 		c.String(http.StatusOK, "hello %s, you're at %s\n", c.Query("name"), c.Path)
 	})
 
 	r.GET("/hello/:name", func(c *gow.Context) {
-		// expect /hello/geektutu
 		c.String(http.StatusOK, "hello %s, you're at %s\n", c.Param("name"), c.Path)
 	})
 
